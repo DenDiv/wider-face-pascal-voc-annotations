@@ -52,7 +52,7 @@ def parseImFilename(imFilename, imPath):
 
     return folder, basename, imFilename, str(width), str(height)
 
-def convertWFAnnotations(annotationsPath, targetPath, imPath, unmasked_mode=False):
+def convertWFAnnotations(annotationsPath, targetPath, imPath, unmasked_mode=False, skip_Surgeons=False):
     ann = None
     basename = ''
     with open(annotationsPath) as f:
@@ -74,7 +74,7 @@ def convertWFAnnotations(annotationsPath, targetPath, imPath, unmasked_mode=Fals
                      os.makedirs(targetPath)
                 annFilename = os.path.join(targetPath, basename.replace('.jpg','.xml'))
 
-                if unmasked_mode and folder == "30--Surgeons":
+                if unmasked_mode and folder == "30--Surgeons" and skip_Surgeons:
                     continue
 
                 ann.write(annFilename)
@@ -85,6 +85,9 @@ def convertWFAnnotations(annotationsPath, targetPath, imPath, unmasked_mode=Fals
 
 
 if __name__ == '__main__':
+    """
+    if skip_Surgeons == 1 than wider_val can be used as true validation, else wider_val used only for test face detection.
+    """
     import argparse
 
     PARSER = argparse.ArgumentParser()
@@ -92,8 +95,10 @@ if __name__ == '__main__':
     PARSER.add_argument('-tp', '--target-path', help='the target directory path where XML files will be copied.')
     PARSER.add_argument('-ip', '--images-path', help='the images directory path. ie:"./WIDER_train/images"')
     PARSER.add_argument('--unmasked_mode', help='create xmls for unmasked_mode', default=0, type=int)
+    PARSER.add_argument('--skip_Surgeons', help='skip Surgeons class', default=0, type=int)
 
     ARGS = vars(PARSER.parse_args())
     
-    convertWFAnnotations(ARGS['annotations_path'], ARGS['target_path'], ARGS['images_path'], bool(ARGS['unmasked_mode']))
+    convertWFAnnotations(ARGS['annotations_path'], ARGS['target_path'], ARGS['images_path'], bool(ARGS['unmasked_mode'])
+                         , bool(ARGS['skip_Surgeons']))
 
